@@ -1,6 +1,7 @@
 package com.example.decisionmakingapp
 
 import android.os.Bundle
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +34,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.decisionmakingapp.ui.theme.DecisionMakingAppTheme
@@ -45,101 +48,123 @@ class MainActivity : ComponentActivity() {
         setContent {
             DecisionMakingAppTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    val introMessage = "Should we go?"
                     Screen(
                         modifier = Modifier.padding(0.dp),
-                        introMessage,
                         yesButton = { button.yesButton()},
                         noButton = { button.noButton()},
-                        maybeButton = { button.maybeButton()})
+                        maybeButton = { button.maybeButton()},
+                        clickCount = button.clickCounter)
                 }
             }
         }
     }
 }
 
+// Code for all the button operations and the button counter
 class ButtonOperations{
-    // Code for all the button operations and the button counter
-    private val clickCounter = 0
+    private var _clickCounter = mutableStateOf(0)
+
+    // Read-only Int for UI display
+    val clickCounter: Int
+        get() = _clickCounter.value
 
     fun yesButton(){
-        // Code for when Yes is pressed
+        _clickCounter.value++
     }
 
     fun noButton(){
-        // Code for when No is pressed
+        _clickCounter.value++
     }
 
     fun maybeButton(){
-        // Code for when Maybe is pressed
+        _clickCounter.value++
     }
 }
 
 @Composable
 fun Screen(modifier: Modifier,
-           message: String,
            yesButton: ()-> Unit,
            noButton: ()-> Unit,
-           maybeButton: ()-> Unit) {
+           maybeButton: ()-> Unit,
+           clickCount: Int) {
     // UI for Background Image
     val image = painterResource(R.drawable.bgimage)
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+        // Background image
         Image(
             modifier = Modifier.fillMaxSize(),
             painter = image,
             contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
+            contentScale = ContentScale.Crop)
+
+        // Student Details
+        Column(modifier = Modifier.align(Alignment.TopStart)
+            .padding(top = 50.dp, start = 30.dp),
+            verticalArrangement = Arrangement.Center){
+            Text("Student ID: 1860227",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text("CCID: hhanda2",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.SemiBold)
+        }
+
         //UI for messages and buttons
         Column(modifier = Modifier.size(width = 500.dp, height = 500.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            // For message
-            Row(modifier = Modifier.padding(8.dp))
-            {
-                TextDisplay(modifier, message)
-            }
-            Spacer(modifier = Modifier.height(10.dp))
+
+            // For intro message
+            val introMessage = "Should we go?"
+            TextDisplay(Modifier.padding(8.dp), introMessage,45.sp)
+
+            Spacer(modifier = Modifier.height(15.dp))
+
             // For buttons
             Row() {
                 Button(onClick = {yesButton()},
                     shape  = RoundedCornerShape(12.dp),
                     modifier = Modifier
-                        .height((50.dp))){
-                    Text("YES!")
+                        .height((55.dp))){
+                    Text("YES!", fontSize = 24.sp, fontWeight = FontWeight.Normal)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 Button(onClick = {maybeButton()},
                     shape  = RoundedCornerShape(12.dp),
                     modifier = Modifier
-                        .height((50.dp))){
-                    Text("Maybe...")
+                        .height((55.dp))){
+                    Text("Maybe...", fontSize = 24.sp, fontWeight = FontWeight.Normal)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
-                Button(onClick = {noButton},
+                Button(onClick = {noButton()},
                     shape  = RoundedCornerShape(12.dp),
                     modifier = Modifier
-                        .height((50.dp))){
-                    Text("Nope!")
+                        .height((55.dp))){
+                    Text("Nope!", fontSize = 24.sp, fontWeight = FontWeight.Normal)
                 }
             }
+            // For Decision
+            // For click counter
+            val counterMessage = "Click Count: $clickCount"
+            TextDisplay(Modifier.padding(16.dp), counterMessage, 20.sp)
         }
     }
 }
 
 @Composable
-fun TextDisplay(modifier: Modifier, message: String){
+fun TextDisplay(modifier: Modifier, message: String, textSize: TextUnit){
     Text(
         message,
         modifier = modifier,
         color = Color.Black,
-        fontSize = 50.sp,
+        fontSize = textSize,
         textAlign = TextAlign.Center,
-        //lineHeight = 70.sp,
         fontWeight = FontWeight.Bold,
         fontFamily = FontFamily.SansSerif
     )
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun ScreenPreview() {
     val button = ButtonOperations()
@@ -150,6 +175,7 @@ fun ScreenPreview() {
             introMessage,
             yesButton = { button.yesButton()},
             noButton = { button.noButton()},
-            maybeButton = { button.maybeButton()})
+            maybeButton = { button.maybeButton()},
+            clickCount = button.clickCounter)
     }
-}
+}*/
