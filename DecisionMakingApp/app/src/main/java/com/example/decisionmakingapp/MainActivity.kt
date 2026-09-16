@@ -53,7 +53,8 @@ class MainActivity : ComponentActivity() {
                         yesButton = { button.yesButton()},
                         noButton = { button.noButton()},
                         maybeButton = { button.maybeButton()},
-                        clickCount = button.clickCounter)
+                        clickCount = button.clickCounter,
+                        decision = button.decision)
                 }
             }
         }
@@ -62,22 +63,46 @@ class MainActivity : ComponentActivity() {
 
 // Code for all the button operations and the button counter
 class ButtonOperations{
+    private var _decisions = listOf("YES!", "Nope!")
+    private var _decision = mutableStateOf("")
     private var _clickCounter = mutableStateOf(0)
 
-    // Read-only Int for UI display
+    // Read-only Int for UI display of click counter
     val clickCounter: Int
         get() = _clickCounter.value
+    // Read-only String for UI display of decisions
+    val decision: String
+        get() = _decision.value
 
     fun yesButton(){
         _clickCounter.value++
+        val index = decisionDecider(50)
+        _decision.value = _decisions[index]
     }
 
     fun noButton(){
         _clickCounter.value++
+        val index = decisionDecider(25)
+        _decision.value = _decisions[index]
     }
 
     fun maybeButton(){
         _clickCounter.value++
+        val index = decisionDecider(10)
+        _decision.value = _decisions[index]
+    }
+
+    private fun decisionDecider(probability:Int):Int{
+        val result1 = (1..100).random()
+
+        if(result1 <= probability)  // Yes
+        {
+            return 0
+        }
+        else
+        {
+            return 1
+        }
     }
 }
 
@@ -86,15 +111,16 @@ fun Screen(modifier: Modifier,
            yesButton: ()-> Unit,
            noButton: ()-> Unit,
            maybeButton: ()-> Unit,
-           clickCount: Int) {
+           clickCount: Int,
+           decision: String) {
     // UI for Background Image
-    val image = painterResource(R.drawable.bgimage)
+    val image1 = painterResource(R.drawable.bgimage)
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         // Background image
         Image(
             modifier = Modifier.fillMaxSize(),
-            painter = image,
+            painter = image1,
             contentDescription = null,
             contentScale = ContentScale.Crop)
 
@@ -111,9 +137,8 @@ fun Screen(modifier: Modifier,
                 fontWeight = FontWeight.SemiBold)
         }
 
-        //UI for messages and buttons
+        // UI for messages and buttons
         Column(modifier = Modifier.size(width = 500.dp, height = 500.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-
             // For intro message
             val introMessage = "Should we go?"
             TextDisplay(Modifier.padding(8.dp), introMessage,45.sp)
@@ -122,31 +147,41 @@ fun Screen(modifier: Modifier,
 
             // For buttons
             Row() {
-                Button(onClick = {yesButton()},
-                    shape  = RoundedCornerShape(12.dp),
+                Button(
+                    onClick = { yesButton() },
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
-                        .height((55.dp))){
+                        .height((55.dp))
+                ) {
                     Text("YES!", fontSize = 24.sp, fontWeight = FontWeight.Normal)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
-                Button(onClick = {maybeButton()},
-                    shape  = RoundedCornerShape(12.dp),
+                Button(
+                    onClick = { maybeButton() },
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
-                        .height((55.dp))){
+                        .height((55.dp))
+                ) {
                     Text("Maybe...", fontSize = 24.sp, fontWeight = FontWeight.Normal)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
-                Button(onClick = {noButton()},
-                    shape  = RoundedCornerShape(12.dp),
+                Button(
+                    onClick = { noButton() },
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
-                        .height((55.dp))){
+                        .height((55.dp))
+                ) {
                     Text("Nope!", fontSize = 24.sp, fontWeight = FontWeight.Normal)
                 }
             }
-            // For Decision
             // For click counter
             val counterMessage = "Click Count: $clickCount"
             TextDisplay(Modifier.padding(16.dp), counterMessage, 20.sp)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // For decision
+            val decisionMessage = "Decision: $decision"
+            TextDisplay(modifier = Modifier.padding(8.dp), decisionMessage, 30.sp)
         }
     }
 }
@@ -163,19 +198,3 @@ fun TextDisplay(modifier: Modifier, message: String, textSize: TextUnit){
         fontFamily = FontFamily.SansSerif
     )
 }
-
-/*@Preview(showBackground = true)
-@Composable
-fun ScreenPreview() {
-    val button = ButtonOperations()
-    DecisionMakingAppTheme {
-        val introMessage = "Should we go?"
-        Screen(
-            modifier = Modifier.padding(0.dp),
-            introMessage,
-            yesButton = { button.yesButton()},
-            noButton = { button.noButton()},
-            maybeButton = { button.maybeButton()},
-            clickCount = button.clickCounter)
-    }
-}*/
